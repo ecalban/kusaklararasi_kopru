@@ -1,1 +1,1 @@
-"""Echoes of Anatolia application package."""
+"""Turkish Style Converter application package."""

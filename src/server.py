@@ -132,14 +132,14 @@ class AppHandler(BaseHTTPRequestHandler):
 def main() -> None:
     # Terminalden verilen --host ve --port ayarlarını okur.
     # Örnek: python3 -m src.server --port 8001
-    parser = argparse.ArgumentParser(description="Echoes of Anatolia yerel web sunucusu")
+    parser = argparse.ArgumentParser(description="Turkish Style Converter yerel web sunucusu")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", default=8000, type=int)
     args = parser.parse_args()
 
     # ThreadingHTTPServer aynı anda birden fazla isteğe cevap verebilir.
     server = ThreadingHTTPServer((args.host, args.port), AppHandler)
-    print(f"Echoes of Anatolia çalışıyor: http://{args.host}:{args.port}")
+    print(f"Turkish Style Converter çalışıyor: http://{args.host}:{args.port}")
     print("Durdurmak için Ctrl+C")
     server.serve_forever()
 

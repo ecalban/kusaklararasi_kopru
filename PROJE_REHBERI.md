@@ -7,7 +7,7 @@ Bu dosya, projeyi hocaya anlatırken elinin altında olacak ana rehberdir. Amaç
 Projenin adı:
 
 ```text
-Echoes of Anatolia
+Turkish Style Converter
 ```
 
 Proje, kullanıcının yazdığı modern Türkçe bir metni seçilen tarihsel/edebi üsluba dönüştürür.
@@ -390,7 +390,7 @@ Telefonumun şarjı bittiği için sana geç cevap verdim.
 
 ### Proje Tanıtımı
 
-Projenin adı Echoes of Anatolia, yani Anadolu'nun Yankıları. Proje, modern Türkçe cümleleri eski edebi metin veya Anadolu ozanı üslubuna dönüştürmeyi amaçlar. Bu problem önemlidir çünkü öğrencilerin eski metinlerle bağ kurmasını ve farklı üslup özelliklerini uygulamalı olarak görmesini sağlar.
+Projenin adı Turkish Style Converter, yani Türkçe Üslup Dönüştürücü. Proje, modern Türkçe cümleleri eski edebi metin veya Anadolu ozanı üslubuna dönüştürmeyi amaçlar. Bu problem önemlidir çünkü öğrencilerin eski metinlerle bağ kurmasını ve farklı üslup özelliklerini uygulamalı olarak görmesini sağlar.
 
 ### Veri Seti Tanıtımı
 
@@ -567,7 +567,7 @@ python3 -m src.server --port 8002
 Şunu doğal şekilde okuyup kendi cümlelerinle anlatabilirsin:
 
 ```text
-Bu projede Echoes of Anatolia, yani Anadolu'nun Yankıları adında bir metin dönüştürme uygulaması geliştirdim. Amacım, modern Türkçe ile yazılan bir cümleyi eski edebi metin veya Anadolu ozanı üslubuna dönüştürmekti. Bunun için RAG + Gemini 2.5 Flash yaklaşımını kullandım.
+Bu projede Turkish Style Converter, yani Türkçe Üslup Dönüştürücü adında bir metin dönüştürme uygulaması geliştirdim. Amacım, modern Türkçe ile yazılan bir cümleyi eski edebi metin veya Anadolu ozanı üslubuna dönüştürmekti. Bunun için RAG + Gemini 2.5 Flash yaklaşımını kullandım.
 
 Kullanıcı bir metin yazdığında sistem önce seçilen personaya ait veri setindeki metinlerle bu girdiği metni karşılaştırıyor. Bu karşılaştırmada TF-IDF vektörleme ve kosinüs benzerliği kullanılıyor. En benzer dört pasaj seçiliyor ve Gemini'ye gönderilen promptun içine örnek olarak ekleniyor. Böylece Gemini sadece genel bilgisini değil, benim veri setimdeki üslup örneklerini de dikkate alarak çıktı üretiyor.
 

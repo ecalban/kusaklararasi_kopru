@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Echoes of Anatolia Sunucusu",
+      "name": "Turkish Style Converter Sunucusu",
       "type": "python",
       "request": "launch",
       "module": "src.server",
