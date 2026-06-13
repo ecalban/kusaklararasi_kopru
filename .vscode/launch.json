@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Kuşaklararası Köprü Sunucusu",
+      "name": "Echoes of Anatolia Sunucusu",
       "type": "python",
       "request": "launch",
       "module": "src.server",

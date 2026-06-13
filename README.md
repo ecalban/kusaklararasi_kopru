@@ -1,4 +1,4 @@
-# Intergenerational Bridge
+# Echoes of Anatolia
 
 An AI/NLP web application that transforms modern Turkish text into either historical literary Turkish or the style of an Anatolian folk poet using **RAG + Gemini 2.5 Flash**.
 

@@ -1,1 +1,1 @@
-"""Kusaklararasi Kopru application package."""
+"""Echoes of Anatolia application package."""
