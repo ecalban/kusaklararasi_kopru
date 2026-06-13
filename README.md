@@ -1,129 +1,126 @@
 # Kuşaklararası Köprü
 
-Modern Türkçe bir metni eski edebi Türkçe veya Anadolu ozanı üslubuna dönüştüren RAG + Gemini tabanlı Yapay Zeka / NLP projesi.
+An AI/NLP web application that transforms modern Turkish text into either historical literary Turkish or the style of an Anatolian folk poet using **RAG + Gemini 2.5 Flash**.
 
-Projeyi kod üzerinden anlamak ve öğretmen sorularına hazırlanmak için önce `PROJE_REHBERI.md` dosyasını okuyun.
+For the detailed Turkish project and presentation guide, see [`PROJE_REHBERI.md`](PROJE_REHBERI.md).
 
-## Nasıl Çalıştırılır?
+## Setup
 
-VS Code ile `kusaklararasi-kopru` klasörünü açın.
+Open the project folder in VS Code.
 
-Proje klasöründe `.env` adlı bir dosya oluşturup Gemini API bilgilerini yazın:
+Create a `.env` file in the project root and add your Google AI Studio credentials:
 
 ```text
-GEMINI_API_KEY=google_ai_studio_keyiniz
+GEMINI_API_KEY=your_google_ai_studio_key
 GEMINI_MODEL=gemini-2.5-flash
 ```
 
-429 kota/hız sınırı hatası alırsanız birkaç dakika bekleyip tekrar deneyin. Sunum sırasında daha hafif bir Gemini modeli kullanmak isterseniz `.env` içinde şu satırı geçici olarak değiştirebilirsiniz:
+If the Gemini API returns a `429` rate-limit error, wait a few minutes before retrying. You can temporarily use the lighter model by changing the model setting to:
 
 ```text
 GEMINI_MODEL=gemini-2.5-flash-lite
 ```
 
-Sonra terminalde çalıştırın:
+Start the local server:
 
 ```bash
 python3 -m src.server --port 8001
 ```
 
-Tarayıcıdan açın:
+Open the application at:
 
 ```text
 http://127.0.0.1:8001
 ```
 
-8001 doluysa farklı bir port verebilirsiniz.
+Use another port if `8001` is already occupied.
 
-## Proje Hangi Problemi Çözer?
+## Problem Statement
 
-Günümüzde kullanılan sade Türkçe ile eski edebi Türkçe ve halk edebiyatı dili arasında kopukluk vardır. Bu proje, kullanıcının yazdığı modern bir metni seçilen üsluba göre yeniden yazar.
+Modern Turkish differs considerably from historical literary Turkish and Anatolian folk poetry. This project rewrites a modern Turkish input according to a selected literary persona while preserving its original meaning.
 
-Hedef kitle:
+Target users include:
 
-- Edebiyat derslerinde eski metinleri daha anlaşılır ve ilgi çekici hale getirmek isteyen öğrenciler
-- Türkçe dil ve üslup çalışmaları yapan kişiler
-- Dijital kültürel miras projeleri
+- Students exploring historical Turkish literature
+- People studying Turkish language and writing styles
+- Digital cultural heritage projects
 
-## Veri Seti Tanıtımı
+## Datasets
 
-Projede kullanıcının verdiği iki CSV veri seti kullanılmıştır.
+The project uses two Turkish text datasets:
 
-| Veri seti | Sınıf / Persona | CSV satırı | Kullanılan örnek |
+| Dataset | Class / Persona | CSV rows | Usable examples |
 |---|---:|---:|---:|
-| `genisletilmis_eski_edebi_metinler.csv` | Eski Edebi Metin | 1721 | 1721 |
-| `anadolu_ozanlari_veri_seti.csv` | Anadolu Ozanı | 471 | 386 |
-| Toplam | 2 sınıf | 2192 | 2107 |
+| `genisletilmis_eski_edebi_metinler.csv` | Historical Literary Text | 1,721 | 1,721 |
+| `anadolu_ozanlari_veri_seti.csv` | Anatolian Folk Poet | 471 | 386 |
+| Total | 2 classes | 2,192 | 2,107 |
 
-CSV kolonları:
+CSV columns:
 
-- `yazar_adi`
-- `metin_pasaji`
-- `kaynak_link`
-- `donem`
+- `yazar_adi` — author name
+- `metin_pasaji` — text passage
+- `kaynak_link` — source URL
+- `donem` — literary period
 
-Veri formatı metindir. Çok kısa olan bazı Anadolu ozanı başlık satırları eğitim dışında bırakılmıştır.
+Very short rows, which are usually titles rather than usable passages, are filtered out.
 
-## Veri Ön İşleme
+## Data Preprocessing
 
-Modelden önce şu işlemler yapılmıştır:
+The following preprocessing steps are applied:
 
-1. CSV dosyaları okunmuştur.
-2. `metin_pasaji` alanı ana metin olarak seçilmiştir.
-3. Boş veya çok kısa metinler filtrelenmiştir.
-4. Metinler küçük harfe çevrilmiştir.
-5. Türkçe karakter uyumu için Unicode normalizasyonu yapılmıştır.
-6. Metinler tokenlara ayrılmıştır.
-7. Çok sık ve tek başına ayırt edici olmayan stop-word kelimeleri çıkarılmıştır.
-8. Naive Bayes değerlendirme modeli için eğitim/test ayrımı yapılmıştır.
+1. Read the source CSV files.
+2. Select `metin_pasaji` as the primary text field.
+3. Remove empty and very short passages.
+4. Convert text to lowercase.
+5. Apply Unicode normalization for Turkish characters.
+6. Tokenize the text.
+7. Remove common stop words that provide little classification value.
+8. Create an approximately 80/20 train-test split for the Naive Bayes evaluation model.
 
-## Kullanılan Yapay Zeka Yöntemi
+## AI Architecture
 
-Bu projedeki ana üretim yaklaşımı:
+The main generation approach is:
 
 ```text
 RAG + Gemini 2.5 Flash
 ```
 
-Çalışma sırası:
+Processing flow:
 
-1. Kullanıcı modern Türkçe bir metin girer.
-2. Seçilen personaya ait CSV pasajları TF-IDF vektörlerine çevrilir.
-3. Kullanıcı metni ile veri seti pasajları kosinüs benzerliğiyle karşılaştırılır.
-4. En benzer pasajlar RAG bağlamı olarak seçilir.
-5. Bu örnekler Gemini promptuna eklenir.
-6. Gemini, kullanıcının metnini hedef üslupta yeniden yazar.
-7. Naive Bayes modeli, üretilen çıktının hangi persona sınıfına benzediğini ölçer.
+1. The user enters a modern Turkish text and selects a persona.
+2. The input and dataset passages are converted into TF-IDF vectors.
+3. Cosine similarity is used to retrieve the most relevant passages for the selected persona.
+4. The retrieved passages are inserted into the Gemini prompt as RAG context.
+5. Gemini rewrites the input in the target style while preserving its meaning.
+6. A Multinomial Naive Bayes model estimates which persona the generated output resembles.
 
-## Neden Gemini 2.5 Flash Seçildi?
+## Why Gemini 2.5 Flash?
 
-Bu proje sadece sınıflandırma problemi değildir; asıl amaç metin üretmektir. Naive Bayes gibi klasik modeller sınıf tahmini yapabilir ama doğal ve çeşitli metin üretmekte yeterli değildir.
+This is a text-generation task rather than only a classification task. A classical classifier can identify a style, but it cannot reliably generate natural and varied text.
 
-Gemini 2.5 Flash seçilme sebepleri:
+Gemini 2.5 Flash was selected because it:
 
-- Türkçe metin üretimi için yeterli kalite sunar.
-- Bulutta çalıştığı için bilgisayarda ağır yerel model çalıştırmak gerekmez.
-- RAG promptundaki örnekleri takip edebilir.
-- Proje demosu için hızlı ve pratiktir.
+- Produces sufficiently strong Turkish text
+- Runs in the cloud and does not require a powerful local machine
+- Can follow the retrieved examples included in the RAG prompt
+- Is fast and practical for an interactive demonstration
 
-## Hazır Model Mi Kullanıldı?
+## Pretrained Model and Original Work
 
-Evet. Metin üretimi için hazır **Gemini 2.5 Flash** modeli kullanılmıştır. Bu projede fine-tuning yapılmaz.
+Gemini 2.5 Flash is used as a pretrained language model. The project does not fine-tune or train Gemini from scratch.
 
-Projede sıfırdan yazılan kısımlar:
+The following components were implemented within the project:
 
-- CSV okuma ve veri temizleme
-- TF-IDF vektörleme
-- Kosinüs benzerliğiyle RAG örneği getirme
-- Gemini promptu oluşturma
-- Naive Bayes çıktı değerlendirme modeli
-- Web API ve arayüz
+- CSV loading and text cleaning
+- TF-IDF vectorization
+- Cosine-similarity retrieval
+- RAG prompt construction
+- Multinomial Naive Bayes evaluation model
+- HTTP API and web interface
 
-## Kullanılan Kütüphaneler
+## Technologies
 
-Harici Python paketi zorunlu değildir.
-
-Python standart kütüphanesi:
+No third-party Python package is required. The backend uses Python standard-library modules including:
 
 - `csv`
 - `json`
@@ -139,54 +136,54 @@ Python standart kütüphanesi:
 - `http.server`
 - `unittest`
 
-Ön yüz:
+Frontend:
 
 - HTML
 - CSS
 - Vanilla JavaScript
 
-LLM sağlayıcısı:
+LLM provider:
 
 - Google Gemini API
 
-## Eğitim ve Test Sonuçları
+## Evaluation Results
 
-Gemini tarafında klasik epoch ile eğitim yapılmaz. Gemini bu projede yeniden eğitilmez; veri setinden getirilen örnekler prompt içinde bağlam olarak kullanılır.
+Gemini is not trained inside this project and therefore has no project-specific epoch count. The dataset passages are supplied dynamically through RAG.
 
-Projede ayrıca Naive Bayes değerlendirme modeli eğitilmiştir. Bu model üretilen çıktının hangi persona sınıfına benzediğini ölçmek için kullanılır.
+The project separately trains a Multinomial Naive Bayes classifier to evaluate persona similarity. Its test results are:
 
-| Metrik | Sonuç |
+| Metric | Result |
 |---|---:|
-| Accuracy | 98.3 |
-| Macro F1 | 97.3 |
+| Accuracy | 98.3% |
+| Macro F1 | 97.3% |
 
-Sınıf bazında:
+Per-class results:
 
-| Sınıf | Precision | Recall | F1 | Test örneği |
+| Class | Precision | Recall | F1 | Test examples |
 |---|---:|---:|---:|---:|
-| Eski Edebi Metin | 100.0 | 98.0 | 99.0 | 345 |
-| Anadolu Ozanı | 91.8 | 100.0 | 95.7 | 78 |
+| Historical Literary Text | 100.0% | 98.0% | 99.0% | 345 |
+| Anatolian Folk Poet | 91.8% | 100.0% | 95.7% | 78 |
 
-## Demo Özellikleri
+These metrics belong to the Naive Bayes classifier, not to Gemini's generation quality.
 
-Web arayüzünde:
+## Application Features
 
-- Kullanıcı metin girebilir.
-- Persona seçebilir.
-- Sistem RAG + Gemini ile üslup dönüşümü yapar.
-- Veri setinden getirilen benzer örnek pasajlar gösterilir.
-- Eski kelimeler için sözlükçe gösterilir.
-- Gemini üretim modu görünür.
-- Naive Bayes çıktı persona tahmini ve test başarımı ekranda görünür.
-- Veri seti özeti ve eğitim/test bilgileri ekranda gösterilir.
+- Modern Turkish text input
+- Historical Literary Text and Anatolian Folk Poet personas
+- Adjustable style intensity
+- Gemini-powered text transformation
+- RAG passage display with similarity scores
+- Glossary for historical and literary terms
+- Naive Bayes persona prediction
+- Dataset and evaluation summaries
 
-## Testleri Çalıştırma
+## Running Tests
 
 ```bash
 python3 -m unittest discover -s tests
 ```
 
-## Dosya Yapısı
+## Project Structure
 
 ```text
 kusaklararasi-kopru/
@@ -194,22 +191,25 @@ kusaklararasi-kopru/
     anadolu_ozanlari_veri_seti.csv
     genisletilmis_eski_edebi_metinler.csv
   public/
+    assets/
     index.html
     styles.css
     app.js
   src/
+    __init__.py
     server.py
     style_engine.py
   tests/
     test_style_engine.py
+  .env.example
+  PROJE_REHBERI.md
+  README.md
 ```
 
-## Geliştirme Önerileri
+## Possible Improvements
 
-Proje geliştirilecek olursa:
-
-- Daha fazla yazar ve dönem eklenebilir.
-- Persona sayısı artırılabilir.
-- Retrieval için embedding tabanlı arama kullanılabilir.
-- Daha büyük paralel veri seti oluşturulursa fine-tuning denenebilir.
-- İnsan değerlendirmesiyle üslup başarısı daha güvenilir ölçülebilir.
+- Add more authors, periods, and personas
+- Replace TF-IDF retrieval with embedding-based semantic search
+- Add human evaluation for output quality
+- Create a larger parallel dataset for supervised fine-tuning experiments
+- Improve retrieval diversity and relevance
